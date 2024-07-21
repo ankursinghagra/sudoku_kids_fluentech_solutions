@@ -253,6 +253,9 @@ function goToStage(stage_id){
     current_grid = JSON.parse(JSON.stringify(levels[current_level-1]['grid']));
 
     // 16 places to snap draggable pieces
+    for (let i = 0; i < snap_grid.length; i++) {
+        snap_grid[i].occupied = false;
+    }
     var snap_grid_containers:Array<any> = [];
     for (let i = 0; i < snap_grid.length; i++) {
         let cont = new PIXI.Container;

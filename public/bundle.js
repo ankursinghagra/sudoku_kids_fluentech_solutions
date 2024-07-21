@@ -246,6 +246,9 @@ function goToStage(stage_id) {
     level_container.addChild(back_btn);
     current_grid = JSON.parse(JSON.stringify(levels[current_level - 1]['grid']));
     // 16 places to snap draggable pieces
+    for (var i = 0; i < snap_grid.length; i++) {
+        snap_grid[i].occupied = false;
+    }
     var snap_grid_containers = [];
     for (var i = 0; i < snap_grid.length; i++) {
         var cont = new PIXI.Container;
