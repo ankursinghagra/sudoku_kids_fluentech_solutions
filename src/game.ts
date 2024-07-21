@@ -14,7 +14,7 @@ globalThis.__PIXI_APP__ = app;
 document.body.appendChild(app.view);
 
 // configs
-var current_level = 20;
+var current_level = 1;
 var levels = [
     {
         'id':1,

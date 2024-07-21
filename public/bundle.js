@@ -1,12 +1,21 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
+/*******************************************/
+/*******************************************/
+// Project : Sudoku games for kids 
+// Built for : Fluentech Solutions Pvt Ltd. 
+// Author: Ankur Singh
+/*******************************************/
+/*******************************************/
 Object.defineProperty(exports, "__esModule", { value: true });
 var PIXI = require("pixi.js");
 // init the application
 var app = new PIXI.Application({ height: 600, width: 700 });
 globalThis.__PIXI_APP__ = app;
+// add to dom
 document.body.appendChild(app.view);
-var current_level = 20;
+// configs
+var current_level = 1;
 var levels = [
     {
         'id': 1,
@@ -145,6 +154,7 @@ var level_drags_positions = [
     }
 ];
 var snap_grid = [{ x: 89, y: 210, occupied: false }, { x: 192, y: 207, occupied: false }, { x: 290, y: 207, occupied: false }, { x: 389, y: 203, occupied: false }, { x: 90, y: 307, occupied: false }, { x: 192, y: 310, occupied: false }, { x: 288, y: 308, occupied: false }, { x: 387, y: 307, occupied: false }, { x: 97, y: 406, occupied: false }, { x: 193, y: 404, occupied: false }, { x: 283, y: 409, occupied: false }, { x: 384, y: 410, occupied: false }, { x: 90, y: 512, occupied: false }, { x: 190, y: 510, occupied: false }, { x: 293, y: 513, occupied: false }, { x: 390, y: 517, occupied: false }];
+//load images and fonts
 var all_resources = {};
 app.loader.add('sudoku_board', './assets/sudoku_blank.jpg');
 app.loader.add('piece_1', './assets/img_1.jpg');
@@ -177,7 +187,7 @@ function renderHome() {
     home_container.addChild(bg_home);
     var _loop_1 = function (i) {
         if (current_level == i + 1) {
-            // blinking
+            // this is current level
             g = new PIXI.Graphics();
             g.beginFill(0x5d0015);
             g.alpha = 0.5;
@@ -188,22 +198,15 @@ function renderHome() {
             g.cursor = 'pointer';
             g.on('pointerdown', function () { goToStage(levels[i]['id']); });
             home_container.addChild(g);
-            /* app.ticker.add((time:any) => {
-                console.log(Math.sin(time));
-                g.alpha = 1/time;
-            });
-            app.ticker.start(); */
         }
         else if (current_level > i + 1) {
+            // already completed levels
             g = new PIXI.Graphics();
             g.beginFill(0x5d0015);
             g.alpha = 0.3;
             g.lineStyle(1);
             g.drawPolygon(levels[i]['coords']);
             g.endFill();
-            //g.interactive = true;
-            //g.cursor = 'pointer';
-            //g.on('pointerdown', function(){goToStage(levels[i]['id']);}, );
             home_container.addChild(g);
         }
     };
@@ -212,11 +215,11 @@ function renderHome() {
         _loop_1(i);
     }
 }
+// create levels
 var current_grid = [];
 var level_container = new PIXI.Container;
 function goToStage(stage_id) {
-    //home_container.destroy();
-    //console.log(stage_id);
+    // level background
     var bg_level = new PIXI.Sprite(all_resources.sudoku_board.texture);
     bg_level.x = app.renderer.width / 2;
     bg_level.y = app.renderer.height / 2;
@@ -224,12 +227,8 @@ function goToStage(stage_id) {
     bg_level.scale.y = app.renderer.height / bg_level.height;
     bg_level.anchor.x = 0.5;
     bg_level.anchor.y = 0.5;
-    /* bg_level.interactive = true;
-    bg_level.cursor = 'pointer';
-    bg_level.on('pointerdown', function(){
-        printMousePos()
-    }, bg_level) */
     level_container.addChild(bg_level);
+    // reset button
     var reset_btn = new PIXI.Sprite(all_resources.reset_btn.texture);
     reset_btn.position.set(550, 5);
     reset_btn.scale.set(0.7, 0.7);
@@ -237,6 +236,7 @@ function goToStage(stage_id) {
     reset_btn.cursor = 'pointer';
     reset_btn.on("click", resetBoard);
     level_container.addChild(reset_btn);
+    // back button
     var back_btn = new PIXI.Sprite(all_resources.back_btn.texture);
     back_btn.position.set(26, 18);
     back_btn.scale.set(1, 1);
@@ -245,11 +245,10 @@ function goToStage(stage_id) {
     back_btn.on("click", backToHome);
     level_container.addChild(back_btn);
     current_grid = JSON.parse(JSON.stringify(levels[current_level - 1]['grid']));
+    // 16 places to snap draggable pieces
     var snap_grid_containers = [];
     for (var i = 0; i < snap_grid.length; i++) {
         var cont = new PIXI.Container;
-        //cont.anchor.x = 0.5;
-        //cont.anchor.y = 0.5;
         cont.height = 100;
         cont.width = 100;
         cont.position.set(snap_grid[i].x, snap_grid[i].y);
@@ -262,11 +261,13 @@ function goToStage(stage_id) {
             snap_grid[i].occupied = true;
         }
     }
+    // 4 initial draggable items
     for (var i = 0; i < 4; i++) {
         create_drags(i + 1);
     }
     app.stage.addChild(level_container);
 }
+// function to create draggable items
 function create_drags(num, fixed) {
     if (fixed === void 0) { fixed = false; }
     var sprite1 = new PIXI.Sprite(all_resources['piece_' + num].texture);
@@ -280,40 +281,18 @@ function create_drags(num, fixed) {
     if (!fixed) {
         sprite1.on('pointerdown', onDragStart, sprite1);
     }
-    //sprite1.on('pointermove', onDragMove, sprite1);
-    //sprite1.on('pointerup', onDragEnd, sprite1);
     return sprite1;
 }
-/* var coords:Array<any> = [];
-function printMousePos() {
-    var cursorX;
-    var cursorY;
-    document.onclick = function(e){
-        cursorX = e.clientX;
-        cursorY = e.clientY;
-        coords.push(cursorX);
-        coords.push(cursorY);
-        console.log(coords);
-    }
-} */
 var dragTarget = null;
 level_container.hitArea = app.screen;
-//level_container.on('pointerup', onDragEnd);
-//level_container.on('pointerupoutside', onDragEnd);
 function onDragMove(event) {
     if (dragTarget) {
-        //dragTarget.parent.toLocal(event.global, null, dragTarget.position);
-        //console.log(event);
         dragTarget.position.set(event.data.global.x, event.data.global.y);
     }
 }
 function onDragStart() {
-    // Store a reference to the data
-    // * The reason for this is because of multitouch *
-    // * We want to track the movement of this particular touch *
     this.alpha = 0.5;
     dragTarget = this;
-    //console.log(dragTarget);
     dragTarget.on('pointermove', onDragMove);
     dragTarget.on('pointerup', onDragEnd);
 }
@@ -324,7 +303,6 @@ function onDragEnd(event) {
         create_drags(dragTarget.num);
         // check if close to a snap target
         var target_snapped = false;
-        //console.log(event.data.global.x +'-'+ event.data.global.y, dragTarget.x+'-'+dragTarget.y);
         for (var i = 0; i < snap_grid.length; i++) {
             if (event.data.global.x > snap_grid[i].x - 50 &&
                 event.data.global.y > snap_grid[i].y - 50 &&
@@ -345,6 +323,7 @@ function onDragEnd(event) {
         }
         else {
             if (check_for_success()) {
+                // level up before going to home
                 current_level++;
                 home_container.destroy();
                 home_container = new PIXI.Container;
@@ -361,8 +340,6 @@ function onDragEnd(event) {
         }
         dragTarget = null;
     }
-    console.log(levels[current_level - 1]['grid']);
-    console.log(current_grid);
 }
 function check_for_success() {
     // check if each item is filled 
@@ -397,9 +374,6 @@ function resetBoard() {
     goToStage(current_level);
 }
 function backToHome() {
-    /* for (let i = 0; i < level_container.children.length; i++) {
-        level_container.children[i].destroy();
-    } */
     level_container.destroy();
     level_container = new PIXI.Container;
 }
