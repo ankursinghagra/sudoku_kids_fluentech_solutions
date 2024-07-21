@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es5",                                    
+    "module": "commonjs",                               
+    "rootDir": "./src", 
+    "outDir": "./dist",                     
+    "moduleResolution": "node",                       
+    "strict": true,                                      
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "allowSyntheticDefaultImports": true      ,
+    "lib": ["es2015","dom", "es2016"]                        
+  }
+}
